@@ -1,0 +1,6 @@
+beautifulsoup4
+requests
+discord_webhook
+random
+json
+time
