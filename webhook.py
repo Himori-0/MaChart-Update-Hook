@@ -4,9 +4,11 @@ import requests, random, json, time
 
 r = lambda: random.randint(0,255)
 
+#Create a text file with your webhook link to use this
 with open('webhook.txt') as f:
     WebhookURL = f.read()
 
+#read a json file with recents update. Create one if you don't have it
 with open('publishedSongs.json') as f:
     data = json.load(f)
 
@@ -34,28 +36,40 @@ while(True):
             mapDifficulty = mapList.find(class_ = "version textfix").getText()
 
             if mapMode == "https://m.mugzone.net/static/img/mode/mode-3.png":
-                webhook = DiscordWebhook(url=WebhookURL, rate_limit_retry = True)
+                webhook = DiscordWebhook(
+                    url=WebhookURL, 
+                    rate_limit_retry = True
+                    )
 
-                # create embed object for webhook
-                embed = DiscordEmbed(title=mapTitle, url="https://m.mugzone.net" + mapLink, description=mapDifficulty, color='%02X%02X%02X' % (r(),r(),r()))
+                embed = DiscordEmbed(
+                    title=mapTitle, 
+                    url="https://m.mugzone.net" + mapLink, 
+                    description=mapDifficulty, 
+                    color='%02X%02X%02X' % (r(),r(),r()))
+
                 data[mapLink] = mapTitle
 
-                # set author
-                embed.set_author(name="New Arrival!", icon_url="https://cdn.discordapp.com/app-icons/823408394098311178/68c5c14be69c732232a7d801ade229ab.png?size=512")
+                embed.set_author(
+                    name="New Arrival!", 
+                    icon_url="https://cdn.discordapp.com/app-icons/823408394098311178/68c5c14be69c732232a7d801ade229ab.png?size=512")
 
-                # set image
-                embed.set_image(url=mapCover)
+                embed.set_image(
+                    url=mapCover
+                    )
 
-                # set thumbnail
-                embed.set_thumbnail(url=mapMode)
+                embed.set_thumbnail(
+                    url=mapMode
+                    )
 
-                # set footer
-                embed.set_footer(text="Updated:")
+                embed.set_footer(
+                    text="Updated:"
+                    )
 
-                # set timestamp (default is now) accepted types are int, float and datetime
                 embed.set_timestamp()
 
                 webhook.add_embed(embed)
+                
+                #Write song that are updated to json file
                 with open('publishedSongs.json', 'w') as f:
                     json.dump(data, f)
                 response = webhook.execute()
@@ -63,4 +77,5 @@ while(True):
         else:
             print(f"{i} duplicated post")
             i = i + 1
+    #anti spamming
     time.sleep(60)
