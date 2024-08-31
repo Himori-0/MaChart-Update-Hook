@@ -22,6 +22,8 @@ result = soup.find(id = "newMap")
 
 mapLists = result.findAll(class_ = "g_map")
 
+chartList = []
+
 i = 0
 
 ##Please ignore this ugly implementation I spent 10 minutes learning Python
@@ -36,6 +38,17 @@ while(True):
             mapDifficulty = mapList.find(class_ = "version textfix").getText()
 
             if mapMode == "https://m.mugzone.net/static/img/mode/mode-3.png":
+                mapURL = "https://m.mugzone.net" + mapLink
+                mapPage = requests.get(mapURL)
+                mapSoup = BeautifulSoup(mapPage.content, "html.parser")
+                
+                charts = mapSoup.findAll(class_ = "item")
+                for chart in charts:
+                    chartStatus = chart.find(class_ = 'col3').getText()
+                    chartAuthor = chart.find(class_ = "col5 textfix")
+                    if chartStatus == "Stable" and "/static/img/mode/mode-3.png" in chart.find('img')['src']:
+                        chartList.append(f"{chart.find('a').getText()} | [{chartAuthor.getText()}](https://m.mugzone.net{chartAuthor.find("a")['href']})")
+                
                 webhook = DiscordWebhook(
                     url=WebhookURL, 
                     rate_limit_retry = True
@@ -43,8 +56,8 @@ while(True):
 
                 embed = DiscordEmbed(
                     title=mapTitle, 
-                    url="https://m.mugzone.net" + mapLink, 
-                    description=mapDifficulty, 
+                    description=mapSoup.find(class_ = 'textfix artist').getText(),
+                    url=mapURL,
                     color='%02X%02X%02X' % (r(),r(),r()))
 
                 data[mapLink] = mapTitle
@@ -59,6 +72,11 @@ while(True):
 
                 embed.set_thumbnail(
                     url=mapMode
+                    )
+                
+                embed.add_embed_field(
+                    name="Charts:", 
+                    value=f'{"\n".join(chartList)}'
                     )
 
                 embed.set_footer(
