@@ -30,6 +30,7 @@ i = 0
 while(True):
     for mapList in mapLists:
         if "song" in mapList.find(class_ = "link")['href'] and mapList.find(class_ = "link")['href'] not in data:
+            chartList = []
             mapLink =  mapList.find(class_ = "link")['href']
             mapCoverLink = mapList.find(class_ = "link")['href']
             mapCover = "http://cni.machart.top/cover/" + mapCoverLink.replace("/song/", "")
